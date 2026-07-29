@@ -24,27 +24,33 @@
   .screen{flex:1;padding:8px 24px 32px;display:none}
   .screen.active{display:block;animation:fade .25s ease}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  h1{font-size:25px;font-weight:800;margin:14px 0 4px;letter-spacing:-.5px}
+  h1{font-size:25px;font-weight:800;margin:6px 0 4px;letter-spacing:-.5px}
   .sub{color:var(--muted);margin:0 0 18px;font-size:15px;font-weight:600}
+  .topback{display:inline-flex;align-items:center;gap:6px;color:var(--indigo);font-weight:800;
+    background:none;border:none;cursor:pointer;font-size:15px;padding:6px 0;font-family:inherit}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  .city{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:20px 12px;
-    font-size:16px;font-weight:800;cursor:pointer;text-align:center;transition:.15s;
-    display:flex;flex-direction:column;gap:4px;align-items:center;letter-spacing:-.2px}
-  .city:hover{border-color:var(--indigo);transform:translateY(-2px)}
-  .city .tag{font-size:11px;font-weight:800;color:#fff;background:var(--indigo);border-radius:20px;padding:3px 12px;letter-spacing:.2px;text-transform:uppercase}
-  .city .cc{font-size:12px;font-weight:600;color:var(--muted)}
+  .city{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:18px 12px;
+    cursor:pointer;text-align:center;transition:.15s;display:flex;flex-direction:column;gap:5px;align-items:center}
+  .city .nm{font-size:16px;font-weight:800;letter-spacing:-.2px}
+  .city .cc{font-size:12.5px;font-weight:600;color:var(--muted)}
+  .city .pill{font-size:11px;font-weight:800;border-radius:20px;padding:3px 12px;letter-spacing:.3px;text-transform:uppercase;margin-top:2px}
+  .city .pill.open{background:var(--indigo);color:#fff}
+  .city .pill.soon{background:#efedf6;color:var(--muted)}
+  .city.active{border-color:var(--indigo)}
+  .city.active:hover{transform:translateY(-2px)}
+  .city.soon{opacity:.62}
+  .city.soon:hover{opacity:1;border-color:var(--line)}
   @media (max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
   .waiverbox{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:18px 20px;
     max-height:40vh;overflow-y:auto;font-size:13.5px;line-height:1.55;color:#33374a;margin-bottom:16px;}
   .waiverbox h3{font-size:15px;font-weight:800;margin:16px 0 3px;color:var(--ink)}
-  .waiverbox h3:first-child{margin-top:0}
+  .waiverbox h3:first-of-type{margin-top:2px}
   .waiverbox .wtitle{font-size:15px;font-weight:900;color:var(--ink);letter-spacing:-.2px}
   .waiverbox .worg{font-size:12.5px;color:var(--muted);font-weight:700;margin:2px 0 4px}
+  .waiverbox .wcaption{font-size:12.5px;color:var(--muted);font-weight:700;margin:0 0 8px}
   .waiverbox p{margin:5px 0}
   .waiverbox ul{margin:5px 0 5px 18px;padding:0}
   .waiverbox li{margin:2px 0}
-  .draftnote{font-size:12px;color:var(--muted);font-style:italic;margin:6px 0 10px}
-  .scrollhint{font-size:12px;color:var(--indigo);font-weight:700;text-align:center;margin:-6px 0 14px}
   label{display:block;font-weight:700;font-size:14px;margin:14px 0 6px}
   .req{color:var(--err)}
   input[type=text],input[type=email],select{width:100%;padding:14px 14px;border:1.5px solid var(--line);
@@ -56,7 +62,7 @@
   .seg{display:flex;gap:10px;margin-top:6px}
   .seg button{flex:1;padding:13px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);
     font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink)}
-  .seg button.sel{border-color:var(--indigo);background:#eeebff;background:#efedff;color:var(--indigo)}
+  .seg button.sel{border-color:var(--indigo);background:#efedff;color:var(--indigo)}
   .check{display:flex;gap:12px;align-items:flex-start;margin-top:16px;background:var(--card);
     border:1.5px solid var(--line);border-radius:12px;padding:14px}
   .check.required{border-color:#d9d6f6;background:#f6f5ff}
@@ -92,7 +98,7 @@
 
   <!-- SCREEN 1: City picker -->
   <section id="s-city" class="screen active">
-    <h1>Welcome &mdash; where are you visiting?</h1>
+    <h1 style="margin-top:14px">Welcome &mdash; where are you visiting?</h1>
     <p class="sub">Tap your UpCenter to check in.</p>
     <div id="cityGrid" class="grid"></div>
   </section>
@@ -105,19 +111,20 @@
       </div>
       <h1 id="soonTitle">Coming soon</h1>
       <p>Check-in for this UpCenter isn't live yet. It's on the way &mdash; see you soon!</p>
-      <button class="btn ghost" style="max-width:260px;margin:26px auto 0" onclick="show('s-city')">&larr; Back</button>
+      <button class="btn ghost" style="max-width:280px;margin:26px auto 0" onclick="show('s-city')">&larr; Choose a different UpCenter</button>
     </div>
   </section>
 
   <!-- SCREEN 3: Waiver + check-in (Brooklyn) -->
   <section id="s-form" class="screen">
+    <button class="topback" onclick="show('s-city')">&larr; Choose a different UpCenter</button>
     <h1>Brooklyn UpCenter check-in</h1>
     <p class="sub">Please read and sign before entering the warehouse or test riding.</p>
 
     <div class="waiverbox" id="waiverBox">
       <div class="wtitle">Upway Brooklyn Warehouse Entry &amp; Test Ride Waiver</div>
       <div class="worg">UPWAY USA INC &middot; Upway Brooklyn UpCenter &middot; 140 Morgan Ave, Brooklyn, NY</div>
-      <p class="draftnote">Customer Acknowledgment &amp; Release of Liability. Draft pending legal review.</p>
+      <div class="wcaption">Customer Acknowledgment &amp; Release of Liability</div>
 
       <h3>1. Age verification</h3>
       <p>By entering the Upway Brooklyn warehouse and test-riding bicycles, you confirm that you are 18 years of age or older.</p>
@@ -228,7 +235,7 @@
 
     <button class="btn" id="submitBtn" disabled onclick="submitCheckin()">Check in &amp; sign</button>
     <div class="err" id="formErr"></div>
-    <button class="btn ghost" style="margin-top:10px" onclick="show('s-city')">&larr; Back</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="show('s-city')">&larr; Choose a different UpCenter</button>
   </section>
 
   <!-- SCREEN 4: Confirmation -->
@@ -266,14 +273,14 @@
 
   // Upway UpCenter locations. Only Brooklyn (New York) is active; others show "coming soon".
   var CITIES = [
-    {name:'Gennevilliers', cc:'France',      active:false},
-    {name:'Berlin',        cc:'Germany',     active:false},
-    {name:'Düsseldorf',    cc:'Germany',     active:false},
-    {name:'New York',      cc:'Brooklyn',    active:true},
-    {name:'Antwerp',       cc:'Belgium',     active:false},
-    {name:'Los Angeles',   cc:'USA',         active:false},
-    {name:'Amsterdam',     cc:'Netherlands', active:false},
-    {name:'Stuttgart',     cc:'Germany',     active:false}
+    {name:'Gennevilliers', cc:'France',       active:false},
+    {name:'Berlin',        cc:'Germany',      active:false},
+    {name:'Düsseldorf',    cc:'Germany',      active:false},
+    {name:'New York',      cc:'Brooklyn, NY', active:true},
+    {name:'Antwerp',       cc:'Belgium',      active:false},
+    {name:'Los Angeles',   cc:'USA',          active:false},
+    {name:'Amsterdam',     cc:'Netherlands',  active:false},
+    {name:'Stuttgart',     cc:'Germany',      active:false}
   ];
 
   var state = {visitType:''};
@@ -288,8 +295,10 @@
     var grid = document.getElementById('cityGrid');
     CITIES.forEach(function(c){
       var el = document.createElement('div');
-      el.className = 'city';
-      el.innerHTML = '<div>'+c.name+'</div>' + (c.active ? '<div class="tag">Check in</div>' : '<div class="cc">'+c.cc+'</div>');
+      el.className = 'city ' + (c.active ? 'active' : 'soon');
+      el.innerHTML = '<div class="nm">'+c.name+'</div>'
+                   + '<div class="cc">'+c.cc+'</div>'
+                   + (c.active ? '<div class="pill open">Check in</div>' : '<div class="pill soon">Coming soon</div>');
       el.onclick = function(){
         if(c.active){ show('s-form'); }
         else { document.getElementById('soonTitle').textContent = c.name + ' — coming soon'; show('s-soon'); }
@@ -333,7 +342,6 @@
   }
 
   function submitCheckin(){
-    // Hard guard: never submit without the mandatory acknowledgement.
     if(!document.getElementById('agreed').checked){
       document.getElementById('formErr').textContent = 'You must read and agree to the waiver to check in.';
       return;
