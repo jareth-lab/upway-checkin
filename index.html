@@ -96,19 +96,19 @@
     </div>
   </section>
 
-  <!-- SCREEN 3: Waiver + check-in (Brooklyn) -->
+  <!-- SCREEN 3: Waiver + check-in (location-aware) -->
   <section id="s-form" class="screen">
     <button class="topback" onclick="show('s-city')">&larr; Choose a different UpCenter</button>
-    <h1>Brooklyn UpCenter check-in</h1>
+    <h1><span id="formTitle">UpCenter</span> check-in</h1>
     <p class="sub">Please read and sign before entering the warehouse or test riding.</p>
 
     <div class="waiverbox" id="waiverBox">
-      <div class="wtitle">Upway Brooklyn Warehouse Entry &amp; Test Ride Waiver</div>
-      <div class="worg">UPWAY USA INC &middot; Upway Brooklyn UpCenter &middot; 140 Morgan Ave, Brooklyn, NY</div>
+      <div class="wtitle">Upway <span class="wLabel">Brooklyn</span> Warehouse Entry &amp; Test Ride Waiver</div>
+      <div class="worg">UPWAY USA INC &middot; Upway <span class="wLabel">Brooklyn</span> UpCenter &middot; <span id="wAddr">140 Morgan Ave, Brooklyn, NY</span></div>
       <div class="wcaption">Customer Acknowledgment &amp; Release of Liability</div>
 
       <h3>1. Age verification</h3>
-      <p>By entering the Upway Brooklyn warehouse and test-riding bicycles, you confirm that you are 18 years of age or older &mdash; or that you are accompanied by a parent or legal guardian &mdash; and that you meet the minimum legal age required to operate the specific bicycle or e-bike you wish to ride.</p>
+      <p>By entering the Upway <span class="wLabel">Brooklyn</span> warehouse and test-riding bicycles, you confirm that you are 18 years of age or older &mdash; or that you are accompanied by a parent or legal guardian &mdash; and that you meet the minimum legal age required to operate the specific bicycle or e-bike you wish to ride.</p>
 
       <h3>2. Acknowledgment of risks</h3>
       <p>You acknowledge that visiting an active warehouse and test-riding bicycles involve significant risks, including but not limited to:</p>
@@ -124,7 +124,7 @@
       <p>You understand that these risks are inherent to the warehouse environment and test-riding activities, and cannot be completely eliminated by UPWAY USA INC's safety measures.</p>
 
       <h3>3. Voluntary assumption of risk</h3>
-      <p>You voluntarily assume all risks associated with your visit to the Upway Brooklyn warehouse and your participation in test-riding bicycles. You understand that you are responsible for your own physical safety and well-being during your visit.</p>
+      <p>You voluntarily assume all risks associated with your visit to the Upway <span class="wLabel">Brooklyn</span> warehouse and your participation in test-riding bicycles. You understand that you are responsible for your own physical safety and well-being during your visit.</p>
 
       <h3>4. Release of liability</h3>
       <p>In consideration for being allowed to enter the warehouse and test-ride bicycles, you hereby release, waive, and discharge UPWAY USA INC, its owners, managers, employees, and agents from any and all claims, demands, causes of action, and liability arising out of or related to:</p>
@@ -184,9 +184,10 @@
     <label>Email <span class="req">*</span></label>
     <input type="email" id="email" autocomplete="email" inputmode="email">
 
-    <label>How did you hear about us? <span style="color:var(--muted);font-weight:600">(optional)</span></label>
+    <label>How did you hear about us? <span class="req">*</span></label>
     <select id="referral">
       <option value="">Select one…</option>
+      <option value="Returning customer">I'm a returning customer</option>
       <option value="Friend/Family">Friend / Family</option>
       <option value="Instagram/Facebook">Instagram / Facebook</option>
       <option value="Google">Google</option>
@@ -195,7 +196,7 @@
       <option value="Other">Other</option>
     </select>
 
-    <label>Are you here for an appointment or walk-in? <span style="color:var(--muted);font-weight:600">(optional)</span></label>
+    <label>Are you here for an appointment or walk-in? <span class="req">*</span></label>
     <div class="seg" id="visitSeg">
       <button type="button" data-v="Appointment">Appointment</button>
       <button type="button" data-v="Walk-in">Walk-in</button>
@@ -250,27 +251,40 @@
     typedName: 'entry.1945620791',
     agreed:    'entry.153213164'
   };
-  var WAIVER_VERSION = 'v2.1-2026-07-warehouse';
+  var WAIVER_VERSION = 'v3.0-2026-07-warehouse';
 
-  // Every UpCenter looks identical on the main page. Only Brooklyn (New York) is wired up;
-  // tapping any other one opens a "coming soon" screen (never shown on the main page).
+  // Every UpCenter looks identical on the main page. Active US pilots (New York + Los Angeles)
+  // open the check-in form; every other one opens a "coming soon" screen.
+  //   loc   = value stored in the sheet's City column (also the board's ?loc= param)
+  //   label = name used throughout the waiver text ("Upway <label> warehouse")
+  //   addr  = street address line shown in the waiver header
   var CITIES = [
     {name:'Gennevilliers', cc:'France',      active:false},
     {name:'Berlin',        cc:'Germany',     active:false},
     {name:'Düsseldorf',    cc:'Germany',     active:false},
-    {name:'New York',      cc:'USA',         active:true},
+    {name:'New York',      cc:'USA',         active:true,  loc:'Brooklyn',     label:'Brooklyn',     addr:'140 Morgan Ave, Brooklyn, NY'},
     {name:'Antwerp',       cc:'Belgium',     active:false},
-    {name:'Los Angeles',   cc:'USA',         active:false},
+    {name:'Los Angeles',   cc:'USA',         active:true,  loc:'Los Angeles',  label:'Los Angeles',  addr:'2400 Marine Ave, Redondo Beach, CA 90278'},
     {name:'Amsterdam',     cc:'Netherlands', active:false},
     {name:'Stuttgart',     cc:'Germany',     active:false}
   ];
 
-  var state = {visitType:''};
+  var state = {loc:'', label:'', visitType:''};
 
   function show(id){
     document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
     document.getElementById(id).classList.add('active');
     window.scrollTo(0,0);
+  }
+
+  function openForm(c){
+    state.loc = c.loc;
+    state.label = c.label;
+    document.getElementById('formTitle').textContent = c.label + ' UpCenter';
+    document.querySelectorAll('.wLabel').forEach(function(el){ el.textContent = c.label; });
+    document.getElementById('wAddr').textContent = c.addr;
+    resetForm();
+    show('s-form');
   }
 
   (function(){
@@ -280,7 +294,7 @@
       el.className = 'city';
       el.innerHTML = '<div class="nm">'+c.name+'</div><div class="cc">'+c.cc+'</div>';
       el.onclick = function(){
-        if(c.active){ show('s-form'); }
+        if(c.active){ openForm(c); }
         else { document.getElementById('soonTitle').textContent = c.name + ' — coming soon'; show('s-soon'); }
       };
       grid.appendChild(el);
@@ -293,6 +307,7 @@
       document.querySelectorAll('#visitSeg button').forEach(function(x){x.classList.remove('sel')});
       if(!already){ b.classList.add('sel'); state.visitType = b.dataset.v; }
       else { state.visitType = ''; }
+      refresh();
     };
   });
 
@@ -302,11 +317,14 @@
     var ok = document.getElementById('firstName').value.trim()
       && document.getElementById('lastName').value.trim()
       && validEmail(document.getElementById('email').value.trim())
+      && document.getElementById('referral').value          // how-heard is mandatory
+      && state.visitType                                     // appointment / walk-in is mandatory
       && document.getElementById('typedName').value.trim()
-      && document.getElementById('agreed').checked;   // acknowledgement is mandatory
+      && document.getElementById('agreed').checked;          // acknowledgement is mandatory
     document.getElementById('submitBtn').disabled = !ok;
   }
   reqIds.forEach(function(id){document.getElementById(id).addEventListener('input',refresh)});
+  document.getElementById('referral').addEventListener('change',refresh);
   document.getElementById('agreed').addEventListener('change',refresh);
 
   function resetForm(){
@@ -326,11 +344,19 @@
       document.getElementById('formErr').textContent = 'You must read and agree to the waiver to check in.';
       return;
     }
+    if(!document.getElementById('referral').value){
+      document.getElementById('formErr').textContent = 'Please tell us how you heard about us.';
+      return;
+    }
+    if(!state.visitType){
+      document.getElementById('formErr').textContent = 'Please select appointment or walk-in.';
+      return;
+    }
     var btn = document.getElementById('submitBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
 
     var fields = {};
-    fields[ENTRY.city]      = 'Brooklyn';
+    fields[ENTRY.city]      = state.loc;
     fields[ENTRY.first]     = document.getElementById('firstName').value.trim();
     fields[ENTRY.last]      = document.getElementById('lastName').value.trim();
     fields[ENTRY.email]     = document.getElementById('email').value.trim();
