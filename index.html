@@ -31,6 +31,7 @@
     cursor:pointer;text-align:center;transition:.15s;display:flex;flex-direction:column;gap:5px;align-items:center}
   .city:hover{border-color:var(--indigo);transform:translateY(-2px)}
   .city .nm{font-size:17px;font-weight:800;letter-spacing:-.2px}
+  .city .nm .flag{font-size:19px;vertical-align:-1px}
   .city .cc{font-size:12.5px;font-weight:600;color:var(--muted)}
   @media (max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
   .waiverbox{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:18px 20px;
@@ -259,14 +260,14 @@
   //   label = name used throughout the waiver text ("Upway <label> warehouse")
   //   addr  = street address line shown in the waiver header
   var CITIES = [
-    {name:'Gennevilliers', cc:'France',      active:false},
-    {name:'Berlin',        cc:'Germany',     active:false},
-    {name:'Düsseldorf',    cc:'Germany',     active:false},
-    {name:'New York',      cc:'USA',         active:true,  loc:'Brooklyn',     label:'Brooklyn',     addr:'140 Morgan Ave, Brooklyn, NY'},
-    {name:'Antwerp',       cc:'Belgium',     active:false},
-    {name:'Los Angeles',   cc:'USA',         active:true,  loc:'Los Angeles',  label:'Los Angeles',  addr:'2400 Marine Ave, Redondo Beach, CA 90278'},
-    {name:'Amsterdam',     cc:'Netherlands', active:false},
-    {name:'Stuttgart',     cc:'Germany',     active:false}
+    {name:'Antwerp',       cc:'Belgium',     flag:'🇧🇪', active:false},
+    {name:'Gennevilliers', cc:'France',      flag:'🇫🇷', active:false},
+    {name:'Berlin',        cc:'Germany',     flag:'🇩🇪', active:false},
+    {name:'Düsseldorf',    cc:'Germany',     flag:'🇩🇪', active:false},
+    {name:'Stuttgart',     cc:'Germany',     flag:'🇩🇪', active:false},
+    {name:'Amsterdam',     cc:'Netherlands', flag:'🇳🇱', active:false},
+    {name:'Los Angeles',   cc:'USA',         flag:'🇺🇸', active:true,  loc:'Los Angeles',  label:'Los Angeles',  addr:'2400 Marine Ave, Redondo Beach, CA 90278'},
+    {name:'New York',      cc:'USA',         flag:'🇺🇸', active:true,  loc:'Brooklyn',     label:'Brooklyn',     addr:'140 Morgan Ave, Brooklyn, NY'}
   ];
 
   var state = {loc:'', label:'', visitType:''};
@@ -292,7 +293,7 @@
     CITIES.forEach(function(c){
       var el = document.createElement('div');
       el.className = 'city';
-      el.innerHTML = '<div class="nm">'+c.name+'</div><div class="cc">'+c.cc+'</div>';
+      el.innerHTML = '<div class="nm"><span class="flag">'+c.flag+'</span> '+c.name+'</div><div class="cc">'+c.cc+'</div>';
       el.onclick = function(){
         if(c.active){ openForm(c); }
         else { document.getElementById('soonTitle').textContent = c.name + ' — coming soon'; show('s-soon'); }
